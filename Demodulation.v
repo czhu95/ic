@@ -2,7 +2,7 @@ module Demodulation (
 	input      wire      clk,
 	input      wire      rst,
 	input      wire      data_in,
-	input      wire      data_in_valid,
+	input      wire      data_in_valid,// 理论上应该没有这个信号
 	output     reg       data_out,
 	output     reg       data_out_valid,
 	output     reg       L_PSDU
@@ -10,7 +10,15 @@ module Demodulation (
 
 	reg [1:0]      status;
 	reg [79:0]     SHR_origin;
-	reg [6:0]      SHR_count;
+	reg [6:0]      SHR_count; // 我们不需要对SHR计数，因为我们也不知道什么时候有data来。
+    // 只要SHR_origin == 和读入缓冲区的data_in完全一样就可以开始读PHR了
+    // 我的想法是设一个64bit的buffer, 然后
+    // always @(posedge clk) begin
+    //     buffer_nxt <= {buffer[62:0], data_in}
+    //     match <= and(buffer == SHR_origin)
+    // end
+    // 这样match信号一旦是1,就代表我们已经读进来了所有的SHR，接下来的数据就是
+    // PHR了
 	reg            flag;
 	reg [31:0]     PHR_save;
 	reg [4:0]      PHR_count;
