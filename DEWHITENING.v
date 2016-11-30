@@ -38,7 +38,9 @@ module DEWHITENING (
     end
 
     always @(posedge clk or negedge rst_n) begin : proc_update_pin
-        if (~rst_n || ~data_in_valid || fsc_end)
+        if (~rst_n)
+            pin_ff <= {9{1'b 1}};
+        else if (~data_in_valid || fsc_end)
             pin_ff <= {9{1'b 1}};
         else
             pin_ff <= pin_ff_nxt;
