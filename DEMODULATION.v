@@ -14,6 +14,7 @@ module DEMODULATION(
     parameter SHR = 80'hF3_98_AA_AA_AA_AA_AA_AA_AA_AA;
     assign match = (buffer == SHR);
 
+    // buffer
     always @(posedge clk or negedge rst) begin
         if (~rst) begin
             buffer  <= {80{1'b1}};
@@ -22,6 +23,7 @@ module DEMODULATION(
         end
     end
  
+    // state
     always @(negedge clk or negedge rst) begin
         if (~rst) begin
             state  <= 0;
@@ -30,6 +32,7 @@ module DEMODULATION(
         end
     end
   
+    // buffer_nxt
     always @(*) begin : proc_buffer_control
         if (state == 2'b 00 || fsc_end) begin
             buffer_nxt <= {data_in, buffer[79 : 1]};
@@ -38,15 +41,17 @@ module DEMODULATION(
         end
     end
   
+    // state_nxt
     always @(*) begin : proc_state_control
         case (state)
-            0 : state_nxt <= (match)? 1 : state;
-            1 : state_nxt <= (fsc_end)? 0 : state;
+            0 : state_nxt <= (match)? 1'b 1 : state;
+            1 : state_nxt <= (fsc_end)? 1'b 0 : state;
         endcase
     end
 
+    // data_out_valid, data_out
     always @(*) begin : proc_out_control
-        data_out <= (state)? data_in : 0;
+        data_out <= (state)? data_in : 1'b 0;
         data_out_valid <= state;
     end
 
